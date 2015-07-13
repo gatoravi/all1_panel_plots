@@ -6,7 +6,7 @@ source("~/src/Scripts/R/multiPlot.R")
 
 usage <- function() {
 # Returns the usage for this script
-    return("\nUsage:\n\tRscript plot_cnv_panel.R merged_cnvs.hq")
+    return("\nUsage:\n\tRscript plot_cnv_panel.R all_loh.infile")
 }
 
 parse_args <-function() {
@@ -60,8 +60,8 @@ plot_panel <- function(all_hq, gains, losses) {
           theme(strip.background = element_blank(), strip.text.x = element_blank()) +
           xlab("Relapse2") + ylab("") +theme(legend.position="none") +
           scale_color_manual(values = c("grey", "red")) +
-          geom_segment(data = gains, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "blue") +
-          geom_segment(data = losses, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "blue") +
+          #geom_segment(data = gains, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "blue") +
+          #geom_segment(data = losses, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "blue") +
           theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
     #p1 <- ggplot(primary1) + geom_point(aes(x = pos, y = value, color = value)) +
     #      facet_grid(variable~chr, space = "free", scales = "free") + ylim(-2, 5) +
@@ -71,16 +71,9 @@ plot_panel <- function(all_hq, gains, losses) {
     #      scale_color_gradient2(limits = c(-2, 2), high = muted("red"), low = muted("blue"), oob = squish) +
     #      geom_segment(data = gains, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "green") +
     #      geom_segment(data = losses, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "green")
-    pdf("~/test_p2.pdf", width = 14)
+    pdf("~/all1_loh_panel.pdf", width = 14)
     grid.arrange(p1, p2, p3, p4, left = textGrob("Copy number difference",  gp = gpar(fontsize=18, fontface="bold"), rot = 90), nrow = 4, ncol = 1)
     dev.off()
-}
-
-melt_df <- function(df) {
-# Melt the cnvs.hq values
-    melt(df, id.vars=c("chr", "pos"),
-        measure.vars = c("Primary1", "Primary2", "Relapse1", "Relapse2",
-                         "Primary1_outlier"))
 }
 
 read_reviewed_segments <- function(gains, losses) {
@@ -109,15 +102,16 @@ main <- function() {
         all$Relapse1_outlier <- all$Relapse1>mean(all$Relapse1)+2*sd(all$Relapse1)|all$Relapse1<mean(all$Relapse1)-2*sd(all$Relapse1)
         all$Relapse2_outlier <- all$Relapse2>mean(all$Relapse2)+2*sd(all$Relapse2)|all$Relapse2<mean(all$Relapse2)-2*sd(all$Relapse2)
         all <- reorder_chr(all, "chr")
-        #all <- melt_df(all)
         save(all, file = "all_cnvs.Robject")
     }
     #TODO - factor out
-    gains <- read.table("cnaseq.cnvhmm.gains.merged.final.txt", head = T)
-    losses <- read.table("cnaseq.cnvhmm.losses.merged.final.txt", head = T)
-    gains_losses <- read_reviewed_segments(gains, losses)
-    gains <- gains_losses[[1]]
-    losses <- gains_losses[[2]]
+    #gains <- read.table("cnaseq.cnvhmm.gains.merged.final.txt", head = T)
+    #losses <- read.table("cnaseq.cnvhmm.losses.merged.final.txt", head = T)
+    #gains_losses <- read_reviewed_segments(gains, losses)
+    #gains <- gains_losses[[1]]
+    #losses <- gains_losses[[2]]
+    gains <- data.frame()
+    losses <- data.frame()
     plot_panel(all, gains, losses)
 }
 

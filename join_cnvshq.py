@@ -7,18 +7,19 @@ def usage():
     sys.exit(1)
 
 def read_into_hash(window_hash, filename, id):
-    print id;
     fh = open(filename, 'r')
     window_hash[id] = {}
     for l in fh:
         l = l.rstrip("\n")
         chr, pos, tumor, normal, diff = l.split()
         locus = chr + ":" + pos
-        window_hash[id][locus] = tumor
+        window_hash[id][locus] = diff
 
 def write_hash(window_hash):
     p1_hash = {}
     p1_hash = window_hash["p1"]
+    print "chr" + "\t" + "pos" + "\t" + "Primary1" + "\t" + "Primary2" + \
+        "\t" + "Relapse1" + "\t" + "Relapse2"
     for key in p1_hash:
         if key in window_hash["r1"] and key in window_hash["r2"] and key in window_hash["p2"]:
             print "\t".join(key.split(":")) + "\t" + window_hash["p1"][key] + "\t" + window_hash["p2"][key] + \
@@ -29,7 +30,7 @@ def main():
     p2 = sys.argv[2]
     r1 = sys.argv[3]
     r2 = sys.argv[4]
-    print(p1, p2, r1, r2)
+    sys.stderr.write(p1 + "\n" +  p2 + "\n" + r1 + "\n" + r2)
     window_hash = {}
     read_into_hash(window_hash, p1, "p1")
     read_into_hash(window_hash, p2, "p2")
