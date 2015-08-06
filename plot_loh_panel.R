@@ -24,12 +24,14 @@ read_file <- function(f1) {
     return(read.table(f1, sep = "\t", head = T))
 }
 
-plot_panel <- function(all_hq, gains, losses) {
+plot_panel <- function(all_hq, primary1_segments, primary2_segments,
+                       relapse1_segments, relapse2_segments) {
 # Plotting happens here
     print(head(all_hq))
-    print(head(gains))
+    print(head(primary1_segments))
     p1 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Primary1, color = Primary1_outlier)) +
-          scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
+          scale_y_continuous(limits = c(0, 100)) +
+          geom_segment(data = primary1_segments, aes(x = chr_start, xend = chr_stop, y = seg_mean * 100, yend = seg_mean * 100, group = chr_start), color = "blue") +
           facet_grid(.~chr, scales = "free", space = "free") +
           theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
@@ -37,7 +39,8 @@ plot_panel <- function(all_hq, gains, losses) {
           scale_color_manual(values = c("grey", "red")) +
           theme(strip.text.y = element_text("Primary1"))+ theme(plot.margin = unit(c(0.1, 0.5, 0.5, 0.5), "cm"))
     p2 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Primary2, color = Primary2_outlier)) +
-          scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
+          scale_y_continuous(limits = c(0, 100)) +
+          geom_segment(data = primary2_segments, aes(x = chr_start, xend = chr_stop, y = seg_mean * 100, yend = seg_mean * 100, group = chr_start), color = "blue") +
           facet_grid(.~chr, scales = "free", space = "free") +
           theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
@@ -45,7 +48,8 @@ plot_panel <- function(all_hq, gains, losses) {
           xlab("Primary2") + ylab("") +theme(legend.position="none") +
           scale_color_manual(values = c("grey", "red")) + theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
     p3 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Relapse1, color = Relapse1_outlier)) +
-          scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
+          scale_y_continuous(limits = c(0, 100)) +
+          geom_segment(data = relapse1_segments, aes(x = chr_start, xend = chr_stop, y = seg_mean * 100, yend = seg_mean * 100, group = chr_start), color = "blue") +
           facet_grid(.~chr, scales = "free", space = "free") +
           theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
@@ -53,66 +57,51 @@ plot_panel <- function(all_hq, gains, losses) {
           xlab("Relapse1") + ylab("") +theme(legend.position="none") +
           scale_color_manual(values = c("grey", "red"))+ theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
     p4 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Relapse2, color = Relapse2_outlier)) +
-          scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
+          scale_y_continuous(limits = c(0, 100)) +
+          geom_segment(data = relapse2_segments, aes(x = chr_start, xend = chr_stop, y = seg_mean * 100, yend = seg_mean * 100, group = chr_start), color = "blue") +
           facet_grid(.~chr, scales = "free", space = "free") +
           theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
           theme(strip.background = element_blank(), strip.text.x = element_blank()) +
           xlab("Relapse2") + ylab("") +theme(legend.position="none") +
           scale_color_manual(values = c("grey", "red")) +
-          #geom_segment(data = gains, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "blue") +
-          #geom_segment(data = losses, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "blue") +
           theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
-    #p1 <- ggplot(primary1) + geom_point(aes(x = pos, y = value, color = value)) +
-    #      facet_grid(variable~chr, space = "free", scales = "free") + ylim(-2, 5) +
-    #      theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
-    #      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-    #      xlab("") + ylab("Copy number difference") +
-    #      scale_color_gradient2(limits = c(-2, 2), high = muted("red"), low = muted("blue"), oob = squish) +
-    #      geom_segment(data = gains, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "green") +
-    #      geom_segment(data = losses, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "green")
-    pdf("~/all1_loh_panel.pdf", width = 14)
-    grid.arrange(p1, p2, p3, p4, left = textGrob("Copy number difference",  gp = gpar(fontsize=18, fontface="bold"), rot = 90), nrow = 4, ncol = 1)
-    dev.off()
+          pdf("~/all1_loh_panel.pdf", width = 14)
+          grid.arrange(p1, p2, p3, p4, left = textGrob("Variant allele frequency",  gp = gpar(fontsize=18, fontface="bold"), rot = 90), nrow = 4, ncol = 1)
+          dev.off()
 }
 
-read_reviewed_segments <- function(gains, losses) {
-    gains$chr <- gains[["CHR"]]
-    gains$variable <- "Relapse2"
-    gains <- reorder_chr(gains, "chr")
-    #gains <- melt(gains, id.vars=c("chr", "nMarkers"), measure.vars = c("START", "END"))
-    losses$chr <- losses[["CHR"]]
-    losses$variable <- "Relapse2"
-    losses <- reorder_chr(losses, "chr")
-    return(list(gains, losses))
-}
 
 main <- function() {
 # Everything starts here
     require(ggplot2)
-    if(file.exists("all_cnvs.Robject")) {
+    loh_robject = "all_loh.robject"
+    if(file.exists(loh_robject)) {
         print("Loading R object")
-        load("all_cnvs.Robject")
+        load(loh_robject)
     } else {
         all_hq <- parse_args()
         all <- read_file(all_hq)
         #zscore of 2 or more
-        all$Primary1_outlier <- all$Primary1>mean(all$Primary1)+2*sd(all$Primary1)|all$Primary1<mean(all$Primary1)-2*sd(all$Primary1)
-        all$Primary2_outlier <- all$Primary2>mean(all$Primary2)+2*sd(all$Primary2)|all$Primary2<mean(all$Primary2)-2*sd(all$Primary2)
-        all$Relapse1_outlier <- all$Relapse1>mean(all$Relapse1)+2*sd(all$Relapse1)|all$Relapse1<mean(all$Relapse1)-2*sd(all$Relapse1)
-        all$Relapse2_outlier <- all$Relapse2>mean(all$Relapse2)+2*sd(all$Relapse2)|all$Relapse2<mean(all$Relapse2)-2*sd(all$Relapse2)
+        all$Primary1_outlier <- all$Primary1>mean(all$Primary1, na.rm = T)+2*sd(all$Primary1, na.rm = T)|all$Primary1<mean(all$Primary1, na.rm = T)-2*sd(all$Primary1, na.rm = T)
+        all$Primary2_outlier <- all$Primary2>mean(all$Primary2, na.rm = T)+2*sd(all$Primary2, na.rm = T)|all$Primary2<mean(all$Primary2, na.rm = T)-2*sd(all$Primary2, na.rm = T)
+        all$Relapse1_outlier <- all$Relapse1>mean(all$Relapse1, na.rm = T)+2*sd(all$Relapse1, na.rm = T)|all$Relapse1<mean(all$Relapse1, na.rm = T)-2*sd(all$Relapse1, na.rm = T)
+        all$Relapse2_outlier <- all$Relapse2>mean(all$Relapse2, na.rm = T)+2*sd(all$Relapse2, na.rm = T)|all$Relapse2<mean(all$Relapse2, na.rm = T)-2*sd(all$Relapse2, na.rm = T)
+        print(head(all))
         all <- reorder_chr(all, "chr")
-        save(all, file = "all_cnvs.Robject")
+        save(all, file = loh_robject)
     }
     #TODO - factor out
-    #gains <- read.table("cnaseq.cnvhmm.gains.merged.final.txt", head = T)
-    #losses <- read.table("cnaseq.cnvhmm.losses.merged.final.txt", head = T)
-    #gains_losses <- read_reviewed_segments(gains, losses)
-    #gains <- gains_losses[[1]]
-    #losses <- gains_losses[[2]]
-    gains <- data.frame()
-    losses <- data.frame()
-    plot_panel(all, gains, losses)
+    primary1_segments <- read.table("primary1_segments.cbs", head = T)
+    primary1_segments$chr <- primary1_segments$chrom
+    primary2_segments <- read.table("primary2_segments.cbs", head = T)
+    primary2_segments$chr <- primary2_segments$chrom
+    relapse1_segments <- read.table("relapse1_segments.cbs", head = T)
+    relapse1_segments$chr <- relapse1_segments$chrom
+    relapse2_segments <- read.table("relapse2_segments.cbs", head = T)
+    relapse2_segments$chr <- relapse2_segments$chrom
+    plot_panel(all, primary1_segments, primary2_segments,
+               relapse1_segments, relapse2_segments)
 }
 
 main()

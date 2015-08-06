@@ -71,7 +71,7 @@ plot_panel <- function(all_hq, gains, losses) {
     #      scale_color_gradient2(limits = c(-2, 2), high = muted("red"), low = muted("blue"), oob = squish) +
     #      geom_segment(data = gains, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "green") +
     #      geom_segment(data = losses, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "green")
-    pdf("~/test_p2.pdf", width = 14)
+    pdf("~/all1_cnv_panel.pdf", width = 14)
     grid.arrange(p1, p2, p3, p4, left = textGrob("Copy number difference",  gp = gpar(fontsize=18, fontface="bold"), rot = 90), nrow = 4, ncol = 1)
     dev.off()
 }

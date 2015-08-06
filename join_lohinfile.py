@@ -12,8 +12,11 @@ def read_into_hash(window_hash, filename, id):
     for l in fh:
         l = l.rstrip("\n")
         chr, pos, nfreq, tfreq, status = l.split()
-        locus = chr + ":" + pos
-        window_hash[id][locus] = tfreq
+        if chr == "chrom":
+            continue
+        if float(nfreq) >= 40 and float(nfreq) <= 60:
+            locus = chr + ":" + pos
+            window_hash[id][locus] = tfreq
 
 def write_hash(window_hash):
     p1_hash = {}
