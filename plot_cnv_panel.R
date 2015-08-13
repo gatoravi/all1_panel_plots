@@ -29,7 +29,7 @@ plot_panel <- function(all_hq, gains, losses) {
     print(head(all_hq))
     print(head(gains))
     p1 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Primary1, color = Primary1_outlier)) +
-          scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
+          scale_size_continuous(range = c(1,1)) + scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
           facet_grid(.~chr, scales = "free", space = "free") +
           theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
@@ -37,7 +37,7 @@ plot_panel <- function(all_hq, gains, losses) {
           scale_color_manual(values = c("grey", "red")) +
           theme(strip.text.y = element_text("Primary1"))+ theme(plot.margin = unit(c(0.1, 0.5, 0.5, 0.5), "cm"))
     p2 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Primary2, color = Primary2_outlier)) +
-          scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
+          scale_size_continuous(range = c(1,1)) + scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
           facet_grid(.~chr, scales = "free", space = "free") +
           theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
@@ -45,7 +45,7 @@ plot_panel <- function(all_hq, gains, losses) {
           xlab("Primary2") + ylab("") +theme(legend.position="none") +
           scale_color_manual(values = c("grey", "red")) + theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
     p3 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Relapse1, color = Relapse1_outlier)) +
-          scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
+          scale_size_continuous(range = c(1,1)) + scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
           facet_grid(.~chr, scales = "free", space = "free") +
           theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
@@ -53,25 +53,17 @@ plot_panel <- function(all_hq, gains, losses) {
           xlab("Relapse1") + ylab("") +theme(legend.position="none") +
           scale_color_manual(values = c("grey", "red"))+ theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
     p4 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Relapse2, color = Relapse2_outlier)) +
-          scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
+          scale_size_continuous(range = c(1,1)) + scale_y_continuous(limits = c(-4, 4), breaks = c(-2, 0, 2, 4)) +
           facet_grid(.~chr, scales = "free", space = "free") +
           theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
           theme(strip.background = element_blank(), strip.text.x = element_blank()) +
           xlab("Relapse2") + ylab("") +theme(legend.position="none") +
           scale_color_manual(values = c("grey", "red")) +
-          geom_segment(data = gains, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "blue") +
-          geom_segment(data = losses, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "blue") +
+          geom_segment(data = gains, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, size = 3, group = START), color = "black") +
+          geom_segment(data = losses, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, size = 3, group = START), color = "black") +
           theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
-    #p1 <- ggplot(primary1) + geom_point(aes(x = pos, y = value, color = value)) +
-    #      facet_grid(variable~chr, space = "free", scales = "free") + ylim(-2, 5) +
-    #      theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
-    #      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-    #      xlab("") + ylab("Copy number difference") +
-    #      scale_color_gradient2(limits = c(-2, 2), high = muted("red"), low = muted("blue"), oob = squish) +
-    #      geom_segment(data = gains, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "green") +
-    #      geom_segment(data = losses, aes(x = START, xend = END, y = Adjusted_CN1 - Adjusted_CN2, yend = Adjusted_CN1 - Adjusted_CN2, group = START), color = "green")
-    pdf("~/all1_cnv_panel.pdf", width = 14)
+    png("./all1_cnv_panel.png", width = 16, height = 10, units = "in", res = 300)
     grid.arrange(p1, p2, p3, p4, left = textGrob("Copy number difference",  gp = gpar(fontsize=18, fontface="bold"), rot = 90), nrow = 4, ncol = 1)
     dev.off()
 }
@@ -104,10 +96,10 @@ main <- function() {
         all_hq <- parse_args()
         all <- read_file(all_hq)
         #zscore of 2 or more
-        all$Primary1_outlier <- all$Primary1>mean(all$Primary1)+2*sd(all$Primary1)|all$Primary1<mean(all$Primary1)-2*sd(all$Primary1)
-        all$Primary2_outlier <- all$Primary2>mean(all$Primary2)+2*sd(all$Primary2)|all$Primary2<mean(all$Primary2)-2*sd(all$Primary2)
-        all$Relapse1_outlier <- all$Relapse1>mean(all$Relapse1)+2*sd(all$Relapse1)|all$Relapse1<mean(all$Relapse1)-2*sd(all$Relapse1)
-        all$Relapse2_outlier <- all$Relapse2>mean(all$Relapse2)+2*sd(all$Relapse2)|all$Relapse2<mean(all$Relapse2)-2*sd(all$Relapse2)
+        all$Primary1_outlier <- all$Primary1 > (mean(all$Primary1)+3*sd(all$Primary1)) | all$Primary1 < (mean(all$Primary1)-3*sd(all$Primary1))
+        all$Primary2_outlier <- all$Primary2 > (mean(all$Primary2)+3*sd(all$Primary2)) | all$Primary2 < (mean(all$Primary2)-3*sd(all$Primary2))
+        all$Relapse1_outlier <- all$Relapse1 > (mean(all$Relapse1)+3*sd(all$Relapse1)) | all$Relapse1 < (mean(all$Relapse1)-3*sd(all$Relapse1))
+        all$Relapse2_outlier <- all$Relapse2 > (mean(all$Relapse2)+3*sd(all$Relapse2)) | all$Relapse2 < (mean(all$Relapse2)-3*sd(all$Relapse2))
         all <- reorder_chr(all, "chr")
         #all <- melt_df(all)
         save(all, file = "all_cnvs.Robject")
