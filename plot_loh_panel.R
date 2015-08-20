@@ -36,7 +36,7 @@ plot_panel <- function(all_hq, primary1_segments, primary2_segments,
           theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
           xlab("Primary1") + ylab("") + theme(legend.position="none") +
-          scale_color_manual(values = c("grey", "red")) +
+          scale_color_manual(values = c("grey", "springgreen4")) +
           theme(strip.text.y = element_text("Primary1"))+ theme(plot.margin = unit(c(0.1, 0.5, 0.5, 0.5), "cm"))
     p2 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Primary2, color = Primary2_outlier, size = 1)) +
           scale_size_continuous(range = c(1,1)) + scale_y_continuous(limits = c(0, 100)) +
@@ -46,7 +46,7 @@ plot_panel <- function(all_hq, primary1_segments, primary2_segments,
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
           theme(strip.background = element_blank(), strip.text.x = element_blank()) +
           xlab("Primary2") + ylab("") +theme(legend.position="none") +
-          scale_color_manual(values = c("grey", "red")) + theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
+          scale_color_manual(values = c("grey", "springgreen4")) + theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
     p3 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Relapse1, color = Relapse1_outlier, size = 1)) +
           scale_size_continuous(range = c(1,1)) + scale_y_continuous(limits = c(0, 100)) +
           #geom_segment(data = relapse1_segments, aes(x = chr_start, xend = chr_stop, y = seg_mean * 100, yend = seg_mean * 100, group = chr_start), color = "blue") +
@@ -55,7 +55,7 @@ plot_panel <- function(all_hq, primary1_segments, primary2_segments,
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
           theme(strip.background = element_blank(), strip.text.x = element_blank()) +
           xlab("Relapse1") + ylab("") +theme(legend.position="none") +
-          scale_color_manual(values = c("grey", "red"))+ theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
+          scale_color_manual(values = c("grey", "springgreen4"))+ theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
     p4 <- ggplot(all_hq) +  geom_point(aes(x = pos, y = Relapse2, color = Relapse2_outlier, size = 1)) +
           scale_size_continuous(range = c(1,1)) + scale_y_continuous(limits = c(0, 100)) +
           geom_segment(data = relapse2_segments, aes(x = chr_start, xend = chr_stop, y = seg_mean * 100, yend = seg_mean * 100, group = chr_start, size = 3), color = "black") +
@@ -65,7 +65,7 @@ plot_panel <- function(all_hq, primary1_segments, primary2_segments,
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
           theme(strip.background = element_blank(), strip.text.x = element_blank()) +
           xlab("Relapse2") + ylab("") +theme(legend.position="none") +
-          scale_color_manual(values = c("grey", "red")) +
+          scale_color_manual(values = c("grey", "springgreen4")) +
           theme(plot.margin = unit(c(-0.5, 0.5, 0.5, 0.5), "cm"))
     png("./all1_loh_panel.png", width = 16, height = 10, units = "in", res = 300)
     grid.arrange(p1, p2, p3, p4, left = textGrob("Variant allele frequency",  gp = gpar(fontsize=18, fontface="bold"), rot = 90), nrow = 4, ncol = 1)
@@ -84,10 +84,10 @@ main <- function() {
         all_hq <- parse_args()
         all <- read_file(all_hq)
         #zscore of 2 or more
-        all$Primary1_outlier <- all$Primary1>mean(all$Primary1, na.rm = T)+3*sd(all$Primary1, na.rm = T)|all$Primary1<mean(all$Primary1, na.rm = T)-3*sd(all$Primary1, na.rm = T)
-        all$Primary2_outlier <- all$Primary2>mean(all$Primary2, na.rm = T)+3*sd(all$Primary2, na.rm = T)|all$Primary2<mean(all$Primary2, na.rm = T)-3*sd(all$Primary2, na.rm = T)
-        all$Relapse1_outlier <- all$Relapse1>mean(all$Relapse1, na.rm = T)+3*sd(all$Relapse1, na.rm = T)|all$Relapse1<mean(all$Relapse1, na.rm = T)-3*sd(all$Relapse1, na.rm = T)
-        all$Relapse2_outlier <- all$Relapse2>mean(all$Relapse2, na.rm = T)+3*sd(all$Relapse2, na.rm = T)|all$Relapse2<mean(all$Relapse2, na.rm = T)-3*sd(all$Relapse2, na.rm = T)
+        all$Primary1_outlier <- all$Primary1>median(all$Primary1, na.rm = T)+3*mad(all$Primary1, na.rm = T)|all$Primary1<median(all$Primary1, na.rm = T)-3*mad(all$Primary1, na.rm = T)
+        all$Primary2_outlier <- all$Primary2>median(all$Primary2, na.rm = T)+3*mad(all$Primary2, na.rm = T)|all$Primary2<median(all$Primary2, na.rm = T)-3*mad(all$Primary2, na.rm = T)
+        all$Relapse1_outlier <- all$Relapse1>median(all$Relapse1, na.rm = T)+3*mad(all$Relapse1, na.rm = T)|all$Relapse1<median(all$Relapse1, na.rm = T)-3*mad(all$Relapse1, na.rm = T)
+        all$Relapse2_outlier <- all$Relapse2>median(all$Relapse2, na.rm = T)+3*mad(all$Relapse2, na.rm = T)|all$Relapse2<median(all$Relapse2, na.rm = T)-3*mad(all$Relapse2, na.rm = T)
         print(head(all))
         all <- reorder_chr(all, "chr")
         save(all, file = loh_robject)
